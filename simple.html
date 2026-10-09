@@ -4,136 +4,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ماموستا | الأب الروحي</title>
+<title>ماموستا</title>
 <style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  padding: 16px;
-  background: #101116;
-  color: #f5f1e7;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  min-width: 300px;
+*{box-sizing:border-box}
+body{
+ margin:0;padding:5px;background:#101116;color:#f5f1e7;
+ font-family:Arial,sans-serif;text-align:center;
 }
-.panel {
-  max-width: 650px;
-  margin: auto;
-  padding: 18px;
-  border: 1px solid #b99a53;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #191a20, #0c0d11);
-  box-shadow: 0 0 20px #b99a5322;
+.panel{
+ width:100%;padding:7px;border:1px solid #b99a53;
+ border-radius:10px;background:#14151a;
 }
-.crown {
-  color: #e7c978;
-  font-size: 27px;
-  margin: 0 10px;
-}
-.flourish {
-  color: #d8b76a;
-  letter-spacing: 5px;
-  font-size: 19px;
-}
-h1 {
-  color: #e7c978;
-  font-size: 35px;
-  margin: 8px 0;
-}
-h2 {
-  color: #f5f1e7;
-  font-size: 19px;
-  margin: 0 0 16px;
-}
-.counters {
-  display: flex;
-  gap: 12px;
-}
-.counter {
-  flex: 1;
-  padding: 14px 8px;
-  border-radius: 13px;
-}
-.wins {
-  background: #153d30;
-  border: 1px solid #287451;
-}
-.losses {
-  background: #451f29;
-  border: 1px solid #823441;
-}
-.counter h3 {
-  font-size: 15px;
-  margin: 0 0 12px;
-}
-.wins h3, .wins .number { color: #65e6a5; }
-.losses h3, .losses .number { color: #ff8c96; }
-.number {
-  font-size: 42px;
-  font-weight: bold;
-  margin: 8px 0 14px;
-}
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-button {
-  width: 48px;
-  height: 42px;
-  border: 0;
-  border-radius: 9px;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  background: #f5f1e7;
-  color: #171717;
-}
-button:active { transform: scale(.95); }
-@media (max-width: 380px) {
-  .counters { gap: 7px; }
-  .counter { padding: 12px 5px; }
-  .counter h3 { font-size: 13px; }
+.top{color:#d8b76a;font-size:10px;line-height:13px}
+h1{font-size:19px;color:#e7c978;margin:2px 0}
+h2{font-size:11px;margin:0 0 5px}
+.counters{display:flex;gap:5px}
+.counter{flex:1;min-width:0;border-radius:7px;padding:5px 2px}
+.wins{background:#153d30}
+.losses{background:#451f29}
+h3{font-size:10px;margin:0 0 4px;white-space:nowrap}
+.wins h3,.wins .number{color:#65e6a5}
+.losses h3,.losses .number{color:#ff8c96}
+.number{font-size:20px;font-weight:bold;margin:3px 0}
+.buttons{display:flex;justify-content:center;gap:5px}
+button{
+ width:27px;height:25px;padding:0;border:0;border-radius:5px;
+ font-size:18px;font-weight:bold;background:#f5f1e7;color:#171717;
 }
 </style>
 </head>
 <body>
 <div class="panel">
-  <div class="flourish">━━━━━━ ✦ ━━━━━━</div>
-  <div>
-    <span class="crown">♛</span>
-    <span class="crown">♛</span>
+ <div class="top">━━━━ 👑 ♛ 👑 ━━━━</div>
+ <h1>ماموستا</h1>
+ <h2>الأب الروحي</h2>
+ <div class="top">━━━━━━━━━━</div>
+ <div class="counters" style="margin-top:6px">
+  <div class="counter wins">
+   <h3>رابحة</h3>
+   <div class="number" id="wins">0</div>
+   <div class="buttons">
+    <button onclick="change('wins',1)">+</button>
+    <button onclick="change('wins',-1)">−</button>
+   </div>
   </div>
-  <h1>ماموستا</h1>
-  <h2>الأب الروحي</h2>
-  <div class="flourish">━━━━━━━━━━━━</div>
-
-  <div class="counters" style="margin-top:20px">
-    <section class="counter wins">
-      <h3>الصفقات الرابحة</h3>
-      <div class="number" id="wins">0</div>
-      <div class="buttons">
-        <button onclick="change('wins',1)">+</button>
-        <button onclick="change('wins',-1)">−</button>
-      </div>
-    </section>
-    <section class="counter losses">
-      <h3>الصفقات الخاسرة</h3>
-      <div class="number" id="losses">0</div>
-      <div class="buttons">
-        <button onclick="change('losses',1)">+</button>
-        <button onclick="change('losses',-1)">−</button>
-      </div>
-    </section>
+  <div class="counter losses">
+   <h3>خاسرة</h3>
+   <div class="number" id="losses">0</div>
+   <div class="buttons">
+    <button onclick="change('losses',1)">+</button>
+    <button onclick="change('losses',-1)">−</button>
+   </div>
   </div>
+ </div>
 </div>
-
 <script>
-const counts = { wins: 0, losses: 0 };
-
-function change(type, amount) {
-  counts[type] = Math.max(0, counts[type] + amount);
-  document.getElementById(type).textContent = counts[type];
+const counts={wins:0,losses:0};
+function change(type,amount){
+ counts[type]=Math.max(0,counts[type]+amount);
+ document.getElementById(type).textContent=counts[type];
 }
 </script>
 </body>
