@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade Counter USD</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:#10141d;color:#f4f6fa;font-family:Arial,sans-serif}
+h2{text-align:center;margin:0 0 16px;font-size:21px}
+.card{background:#1d2635;border:1px solid #354157;border-radius:13px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.label{font-size:13px;color:#aab6c9}
+.num{font-size:28px;font-weight:bold;margin-top:8px}
+.green{color:#30d596}.red{color:#ff6978}
+input{width:100%;margin-top:7px;padding:11px;border-radius:8px;border:1px solid #44516a;background:#101722;color:white;font-size:16px}
+button{border:0;border-radius:9px;padding:13px 6px;font-size:15px;font-weight:bold;cursor:pointer}
+.win{background:#25c987;color:#062719}
+.loss{background:#ff6373;color:#31080e}
+.secondary{background:#303b4e;color:white}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+.small{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#history{max-height:155px;overflow:auto}
+.item{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #354157;font-size:13px}
+.note{font-size:11px;color:#aab6c9;line-height:1.6}
+</style>
+</head>
+<body>
+<h2>📊 عدّاد الصفقات</h2>
+<div class="grid">
+  <div class="card">
+    <div class="label">🟢 صفقات رابحة</div>
+    <div class="num green" id="wins">0</div>
+  </div>
+  <div class="card">
+    <div class="label">🔴 صفقات خاسرة</div>
+    <div class="num red" id="losses">0</div>
+  </div>
+</div>
+<div class="card">
+  <div class="label">صافي الربح والخسارة بالدولار</div>
+  <div class="num" id="net">$0.00</div>
+  <div class="label" id="stats">عدد الصفقات: 0 | نسبة الفوز: 0%</div>
+</div>
+<div class="card">
+  <label class="label" for="stake">مبلغ الصفقة بالدولار ($)</label>
+  <input id="stake" type="number" min="0.01" step="0.01" value="10">
+  <label class="label" for="payout" style="display:block;margin-top:14px">نسبة الربح الصافي المتوقعة (%)</label>
+  <input id="payout" type="number" min="0" step="1" value="80">
+</div>
+<div class="buttons">
+  <button class="win" id="winBtn">＋ ربح</button>
+  <button class="loss" id="lossBtn">－ خسارة</button>
+</div>
+<div class="small">
+  <button class="secondary" id="undo">↩ تراجع عن آخر صفقة</button>
+  <button class="secondary" id="reset">تصفير الكل</button>
+</div>
+<div class="card" style="margin-top:12px">
+  <div class="label" style="margin-bottom:8px">آخر الصفقات</div>
+  <div id="history"><div class="item"><span>ما في صفقات بعد</span><span>—</span></div></div>
+</div>
+<p class="note">سجّل نتيجة كل صفقة يدوياً. الربح يُحسب حسب نسبة الربح المدخلة، والخسارة تُحسب بمبلغ الصفقة كاملاً. هذه اللوحة لا تتصل بمنصة التداول ولا تنفّذ الصفقات. النتائج تبقى محفوظة في هذه الصفحة على نفس المتصفح.</p>
+<script>
+const $=id=>document.getElementById(id);
+let trades=[];
+try{trades=JSON.parse(localStorage.getItem('tradeCounterUSD')||'[]')}catch(e){trades=[]}
+const fmt=n=>'$'+Math.abs(n).toFixed(2);
+function render(){
+ const wins=trades.filter(t=>t.type==='win').length;
+ const losses=trades.length-wins;
+ const net=trades.reduce((s,t)=>s+t.amount,0);
+ $('wins').textContent=wins;
+ $('losses').textContent=losses;
+ $('net').textContent=(net>0?'+':net<0?'−':'')+fmt(net);
+ $('net').className='num '+(net>0?'green':net<0?'red':'');
+ $('stats').textContent='عدد الصفقات: '+trades.length+' | نسبة الفوز: '+(trades.length?Math.round(wins/trades.length*100):0)+'%';
+ $('history').innerHTML=trades.length?trades.slice().reverse().slice(0,40).map((t,i)=>'<div class="item"><span>'+(trades.length-i)+'. '+(t.type==='win'?'ربح':'خسارة')+'</span><strong class="'+(t.amount>=0?'green':'red')+'">'+(t.amount>0?'+':t.amount<0?'−':'')+fmt(t.amount)+'</strong></div>').join(''):'<div class="item"><span>ما في صفقات بعد</span><span>—</span></div>';
+ try{localStorage.setItem('tradeCounterUSD',JSON.stringify(trades))}catch(e){}
+}
+$('winBtn').onclick=()=>{
+ const s=Number($('stake').value),p=Number($('payout').value);
+ if(s<=0||p<0||!Number.isFinite(s)||!Number.isFinite(p)){alert('تأكد من مبلغ الصفقة ونسبة الربح');return}
+ trades.push({type:'win',amount:Math.round(s*p)/100});
+ render();
+};
+$('lossBtn').onclick=()=>{
+ const s=Number($('stake').value);
+ if(s<=0||!Number.isFinite(s)){alert('أدخل مبلغ صفقة صحيح');return}
+ trades.push({type:'loss',amount:-s});
+ render();
+};
+$('undo').onclick=()=>{trades.pop();render()};
+$('reset').onclick=()=>{if(confirm('متأكد بدك تصفّر جميع النتائج؟')){trades=[];render()}};
+render();
+</script>
+</body>
+</html>
